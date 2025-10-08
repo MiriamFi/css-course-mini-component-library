@@ -2,7 +2,13 @@
 import styled from "styled-components";
 import { COLORS } from "../../constants.js";
 
-const sizeStyles = {
+/*
+I chose to use the progress-tag, because the provided link (ARIA: progressbar role) recommended to use
+the native <progress> or <input type="range"> elements rather than the progressbar role.
+In hidsight I realise that we were supposed to use the progressbar role.
+*/
+
+const STYLES = {
   small: {
     "--height": "8px",
     "--outerBorderRadius": "4px",
@@ -21,17 +27,49 @@ const sizeStyles = {
 };
 
 const ProgressBar = ({ value, size }) => {
-  const sizes = sizeStyles[size];
+  const styles = STYLES[size];
+
+  if (!styles) {
+    throw new Error("Unkown size passed to ProgressBar.");
+  }
+
   return (
-    <Progress style={sizes} id="progressbar" max={100} value={value}></Progress>
+    <Progress
+      style={styles}
+      id="progressbar"
+      max={100}
+      value={value}
+      aria-valuenow={value}
+    ></Progress>
   );
 };
 
 const Progress = styled.progress`
-  appearance: none;
+  /* reset styling */
+  -webkit-appearance: none; /* For WebKit browsers (Chrome, Safari, Edge) */
+  -moz-appearance: none; /* For Firefox */
+  appearance: none; /* Standard property */
+  border: none;
+
   width: 370px;
   height: var(--height);
 
+  /* for mozilla */
+  border-radius: var(--outerBorderRadius);
+  box-shadow: inset 0px 2px 4px ${COLORS.transparentGray35};
+
+  progress {
+    background-color: ${COLORS.transparentGray15};
+    padding: var(--padding);
+    box-shadow: inset 0px 2px 4px ${COLORS.transparentGray35};
+  }
+
+  ::-moz-progress-bar {
+    background-color: ${COLORS.primary};
+    border-radius: ${(props) => (props.value === 100 ? " 4px" : "4px 0 0 4px")};
+  }
+
+  /* for chrome, safari */
   ::-webkit-progress-bar {
     background-color: ${COLORS.transparentGray15};
     border-radius: var(--outerBorderRadius);
@@ -41,7 +79,7 @@ const Progress = styled.progress`
 
   ::-webkit-progress-value {
     background-color: ${COLORS.primary};
-    border-radius: ${(props) => (props.value >= 99 ? " 4px" : "4px 0 0 4px")};
+    border-radius: ${(props) => (props.value === 100 ? " 4px" : "4px 0 0 4px")};
   }
 `;
 
