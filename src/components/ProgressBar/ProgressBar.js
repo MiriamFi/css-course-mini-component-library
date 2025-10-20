@@ -1,13 +1,76 @@
 /* eslint-disable no-unused-vars */
 import styled from "styled-components";
 import { COLORS } from "../../constants.js";
+import VisuallyHidden from "../VisuallyHidden";
 
 /*
-I chose to use the progress-tag, because the provided link (ARIA: progressbar role) recommended to use
+I first chose to use the progress-tag, because the provided link (ARIA: progressbar role) recommended to use
 the native <progress> or <input type="range"> elements rather than the progressbar role.
-In hidsight I realise that we were supposed to use the progressbar role.
+In hidsight I realised that we were supposed to use the progressbar role and redid the assignment, but kept the original code in a comment below.
 */
 
+const STYLES = {
+  small: {
+    "--height": "8px",
+    "--outerBorderRadius": "4px",
+    "--padding": 0,
+  },
+  medium: {
+    "--height": "12px",
+    "--outerBorderRadius": "4px",
+    "--padding": 0,
+  },
+  large: {
+    "--height": "16px",
+    "--outerBorderRadius": "8px",
+    "--padding": "4px",
+  },
+};
+
+const ProgressBar = ({ value, size }) => {
+  const styles = STYLES[size];
+
+  if (!styles) {
+    throw new Error("Unkown size passed to ProgressBar.");
+  }
+
+  return (
+    <Wrapper
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      style={styles}
+    >
+      <VisuallyHidden>{value}%</VisuallyHidden>
+      <BarWrapper>
+        <BarFill style={styles} value={value} />
+      </BarWrapper>
+    </Wrapper>
+  );
+};
+
+const Wrapper = styled.div`
+  border-radius: var(--outerBorderRadius);
+  box-shadow: inset 0px 2px 4px ${COLORS.transparentGray35};
+  background-color: ${COLORS.transparentGray15};
+  padding: var(--padding);
+`;
+
+const BarWrapper = styled.div`
+  /* gives the bar border-radius when approaching 100% */
+  border-radius: 4px;
+  overflow: hidden;
+`;
+
+const BarFill = styled.div`
+  width: ${(props) => props.value}%;
+  height: var(--height);
+  background-color: ${COLORS.primary};
+  border-radius: ${(props) => (props.value === 100 ? " 4px" : "4px 0 0 4px")};
+`;
+
+/*
 const STYLES = {
   small: {
     "--height": "8px",
@@ -45,16 +108,16 @@ const ProgressBar = ({ value, size }) => {
 };
 
 const Progress = styled.progress`
-  /* reset styling */
-  -webkit-appearance: none; /* For WebKit browsers (Chrome, Safari, Edge) */
-  -moz-appearance: none; /* For Firefox */
-  appearance: none; /* Standard property */
+  /* reset styling 
+  -webkit-appearance: none; /* For WebKit browsers (Chrome, Safari, Edge) 
+  -moz-appearance: none; /* For Firefox 
+  appearance: none; /* Standard property 
   border: none;
 
   width: 370px;
   height: var(--height);
 
-  /* for mozilla */
+  /* for mozilla
   border-radius: var(--outerBorderRadius);
   box-shadow: inset 0px 2px 4px ${COLORS.transparentGray35};
 
@@ -69,7 +132,7 @@ const Progress = styled.progress`
     border-radius: ${(props) => (props.value === 100 ? " 4px" : "4px 0 0 4px")};
   }
 
-  /* for chrome, safari */
+  /* for chrome, safari
   ::-webkit-progress-bar {
     background-color: ${COLORS.transparentGray15};
     border-radius: var(--outerBorderRadius);
@@ -81,6 +144,6 @@ const Progress = styled.progress`
     background-color: ${COLORS.primary};
     border-radius: ${(props) => (props.value === 100 ? " 4px" : "4px 0 0 4px")};
   }
-`;
+`;*/
 
 export default ProgressBar;
